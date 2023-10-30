@@ -77,4 +77,8 @@ public class Proceso {
     public void setNumCDs(int numCDs) {
         this.numCDs = numCDs;
     }
+
+    public String toString(){
+        return "A";
+    }
 }
