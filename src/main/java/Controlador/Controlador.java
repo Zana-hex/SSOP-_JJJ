@@ -10,6 +10,11 @@ import java.util.Queue;
 
 public class Controlador {
     Queue<Proceso> colaProcesos = new LinkedList<>();
+    Queue<Proceso> colaTiempoReal = new LinkedList<>();
+    Queue<Proceso> colaUsuario = new LinkedList<>();
+    Queue<Proceso> prioridad1 = new LinkedList<>();
+    Queue<Proceso> prioridad2 = new LinkedList<>();
+    Queue<Proceso> prioridad3 = new LinkedList<>();
     public Controlador(){
 
     }
