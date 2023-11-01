@@ -9,19 +9,56 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Controlador {
+
+    int memoriaDisponible = 1024;
+
+    int contadorId = 0;
     Queue<Proceso> colaProcesos = new LinkedList<>();
     Queue<Proceso> colaTiempoReal = new LinkedList<>();
     Queue<Proceso> colaUsuario = new LinkedList<>();
     Queue<Proceso> prioridad1 = new LinkedList<>();
     Queue<Proceso> prioridad2 = new LinkedList<>();
     Queue<Proceso> prioridad3 = new LinkedList<>();
-    public Controlador(){
 
+    public Controlador() {
+
+    }
+
+    public void asignacion() throws InterruptedException {
+        boolean bandera = true;
+        while (!colaProcesos.isEmpty()) {
+            Proceso actual = colaProcesos.poll();
+            if (actual.getPrioridad() == 0) {
+                if (memoriaDisponible - 64 >= 0) {
+                    actual.setMemoriaAsignada(64);
+                    memoriaDisponible -= 64;
+                    colaTiempoReal.offer(actual);
+                }
+                Thread.sleep(1000);
+            }
+
+            if (actual.getPrioridad() == 1) {
+                if (actual.getMegas() <= 32) {
+                    if (memoriaDisponible - 32 >= 0) {
+                        actual.setMemoriaAsignada(32);
+                        memoriaDisponible -= 32;
+                        colaTiempoReal.offer(actual);
+                    } else {
+                        while (bandera) {
+
+                        }
+                    }
+                }
+                Thread.sleep(1000);
+            }
+
+
+        }
     }
 
     public void lector() {
         int tLlegada, prioridad, tProcesador, mb, numImpresoras, numEsc, numModem, numCds;
-        try(BufferedReader in = new BufferedReader(new FileReader("procesos.txt"))) {
+        try (BufferedReader in = new BufferedReader(new FileReader("procesos.txt"))) {
             String str;
             while ((str = in.readLine()) != null) {
                 String[] atributos = str.split(",");
@@ -36,14 +73,16 @@ public class Controlador {
                 numCds = Integer.parseInt(atributos[7]);
 
 
-                Proceso proceso = new Proceso(tLlegada, prioridad,
-                        tProcesador, mb, numImpresoras, numEsc, numModem, numCds);
-                colaProcesos.add(proceso);
+                Proceso proceso = new Proceso(contadorId, tLlegada, prioridad,
+                        tProcesador, mb, numImpresoras, numEsc, numModem, numCds, 0);
+
+                colaProcesos.offer(proceso);
+                contadorId++;
             }
 
-        }
-        catch (IOException e) {
-            System.out.println("File Read Error");
+
+        } catch (IOException e) {
+            System.out.println("Error a leer el archivo");
         }
     }
 }

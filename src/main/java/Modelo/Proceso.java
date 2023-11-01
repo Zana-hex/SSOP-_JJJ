@@ -1,9 +1,10 @@
 package Modelo;
 
 public class Proceso {
-    int tiempoLlegada, prioridad, tiempoProcesador, megas, numImpresoras, numEscaners, numModems, numCDs;
+    int tiempoLlegada, prioridad, tiempoProcesador, megas, numImpresoras,
+            numEscaners, numModems, numCDs, id, memoriaAsignada;
 
-    public Proceso(int tLlegada, int priority, int tProce, int mb, int numImp, int numEsc, int numMod, int numCD){
+    public Proceso(int ID, int tLlegada, int priority, int tProce, int mb, int numImp, int numEsc, int numMod, int numCD, int memAsig){
         this.tiempoLlegada = tLlegada;
         this.prioridad = priority;
         this.tiempoProcesador = tProce;
@@ -12,6 +13,8 @@ public class Proceso {
         this.numEscaners = numEsc;
         this.numModems = numMod;
         this.numCDs = numCD;
+        this.id = ID;
+        this.memoriaAsignada = memAsig;
     }
 
     public int getTiempoLlegada() {
@@ -78,7 +81,23 @@ public class Proceso {
         this.numCDs = numCDs;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getMemoriaAsignada() {
+        return memoriaAsignada;
+    }
+
+    public void setMemoriaAsignada(int memoriaAsignada) {
+        this.memoriaAsignada = memoriaAsignada;
+    }
+
     public String toString(){
-        return "A";
+        return "\nID: " + getId() + "\n Tiempo Llegada: " + getTiempoLlegada()+"___________________";
     }
 }
