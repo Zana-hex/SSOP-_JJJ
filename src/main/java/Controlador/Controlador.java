@@ -29,6 +29,16 @@ public class Controlador {
         Proceso proceso = colaProcesos.poll();
     }
 
+    public boolean verificarCds(Proceso proceso) {
+        if (proceso.getNumCDs() <= cdsDisponibles) {
+            cdsDisponibles -= proceso.getNumCDs();
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     public void asignacion(Proceso actual) throws InterruptedException {
         while (!colaProcesos.isEmpty()) {
             boolean bandera = true;
