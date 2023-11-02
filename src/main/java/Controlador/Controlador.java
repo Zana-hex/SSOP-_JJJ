@@ -11,6 +11,7 @@ import java.util.Queue;
 public class Controlador {
 
     int memoriaDisponible = 1024;
+    final int bloqueMemoria = 32;
 
     int contadorId = 0;
     Queue<Proceso> colaProcesos = new LinkedList<>();
@@ -26,6 +27,7 @@ public class Controlador {
 
     public void asignacion() throws InterruptedException {
         boolean bandera = true;
+        int multiplicador = 2;
         while (!colaProcesos.isEmpty()) {
             Proceso actual = colaProcesos.poll();
             if (actual.getPrioridad() == 0) {
@@ -38,13 +40,19 @@ public class Controlador {
             }
 
             if (actual.getPrioridad() == 1) {
-                if (actual.getMegas() <= 32) {
-                    if (memoriaDisponible - 32 >= 0) {
-                        actual.setMemoriaAsignada(32);
-                        memoriaDisponible -= 32;
-                        colaTiempoReal.offer(actual);
+                if (actual.getMegas() <= bloqueMemoria) {
+                    if (memoriaDisponible - bloqueMemoria >= 0) {
+                        actual.setMemoriaAsignada(bloqueMemoria);
+                        memoriaDisponible -= bloqueMemoria;
+                        prioridad1.offer(actual);
                     } else {
-                        while (bandera) {
+
+                    }
+                } else {
+                    while (bandera) {
+
+                        if (actual.getMegas() <= 32*multiplicador){
+                            actual.setMemoriaAsignada(32*multiplicador);
 
                         }
                     }
