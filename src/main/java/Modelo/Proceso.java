@@ -4,7 +4,8 @@ public class Proceso {
     int tiempoLlegada, prioridad, tiempoProcesador, megas, numImpresoras,
             numEscaners, numModems, numCDs, id, memoriaAsignada;
 
-    public Proceso(int ID, int tLlegada, int priority, int tProce, int mb, int numImp, int numEsc, int numMod, int numCD, int memAsig){
+    public Proceso(int ID, int tLlegada, int priority, int tProce, int mb,
+                   int numImp, int numEsc, int numMod, int numCD, int memAsig){
         this.tiempoLlegada = tLlegada;
         this.prioridad = priority;
         this.tiempoProcesador = tProce;
@@ -15,6 +16,7 @@ public class Proceso {
         this.numCDs = numCD;
         this.id = ID;
         this.memoriaAsignada = memAsig;
+
     }
 
     public int getTiempoLlegada() {

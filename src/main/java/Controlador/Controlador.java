@@ -1,6 +1,6 @@
 package Controlador;
 
-import Modelo.Proceso;
+import Modelo.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,13 +11,15 @@ import java.util.Queue;
 public class Controlador {
 
     int memoriaDisponible = 1024;
-    int impresorasDisponibles = 2;
-    int escanersDisponibles = 1;
-    int modemsDisponibles = 1;
-    int cdsDisponibles = 2;
+    Impresora[] impresorasDisponibles;
+    CD[] CDsDisponibles;
+
+    Modem[] modemsDisponibles;
+
+    Escaner[] escanersDisponibles;
+
     final int bloqueMemoria = 32;
 
-    int contadorId = 0;
     Queue<Proceso> colaProcesos = new LinkedList<>();
     Queue<Proceso> colaTiempoReal = new LinkedList<>();
     Queue<Proceso> colaUsuario = new LinkedList<>();
@@ -27,6 +29,10 @@ public class Controlador {
 
     public Controlador() {
         Proceso proceso = colaProcesos.poll();
+        impresorasDisponibles = new Impresora[2];
+        CDsDisponibles = new CD[2];
+        modemsDisponibles = new Modem[1];
+        escanersDisponibles = new Escaner[1];
     }
 
     public boolean verificarCds(Proceso proceso) {
@@ -74,7 +80,7 @@ public class Controlador {
                                 prioridad3.offer(actual);
                             }
                         } else {
-                            colaProcesos.offer(actual);
+                            colaUsuario.offer(actual);
                         }
                     }
                 } else {
@@ -94,7 +100,7 @@ public class Controlador {
                                         prioridad3.offer(actual);
                                     }
                                 } else {
-                                    colaProcesos.offer(actual);
+                                    colaUsuario.offer(actual);
                                 }
                             }
                             bandera = false;
@@ -135,6 +141,20 @@ public class Controlador {
         }
     }
 
+    public void crearRecursos(){
+        for (var i = 0; i < 2; i ++){
+            Impresora impresora = new Impresora((i+1), "Disponible");
+            impresorasDisponibles[i] = impresora;
+            CD cd = new CD((i+1), "Disponible");
+            CDsDisponibles[i] = cd;
+        }
+        Escaner escaner = new Escaner(1,"Disponible");
+        Modem modem = new Modem(1, "Disponible");
+        escanersDisponibles[0] = escaner;
+        modemsDisponibles[0] = modem;
+
+    }
+
     public void lector() {
         int tLlegada, prioridad, tProcesador, mb, numImpresoras, numEsc, numModem, numCds;
         try (BufferedReader in = new BufferedReader(new FileReader("procesos.txt"))) {
@@ -152,11 +172,10 @@ public class Controlador {
                 numCds = Integer.parseInt(atributos[7]);
 
 
-                Proceso proceso = new Proceso(contadorId, tLlegada, prioridad,
+                Proceso proceso = new Proceso(tLlegada, tLlegada, prioridad,
                         tProcesador, mb, numImpresoras, numEsc, numModem, numCds, 0);
 
                 colaProcesos.offer(proceso);
-                contadorId++;
             }
 
 
