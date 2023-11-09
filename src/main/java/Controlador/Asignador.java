@@ -8,15 +8,19 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Controlador {
+public class Asignador {
 
+    int cdsDisponibles = 0;
+    int impresorasDisponibles = 0;
+    int modemsDisponibles = 0;
+    int escanersDisponibles = 0;
     int memoriaDisponible = 1024;
-    Impresora[] impresorasDisponibles;
-    CD[] CDsDisponibles;
+    Impresora[] impresoras;
+    CD[] cds;
 
-    Modem[] modemsDisponibles;
+    Modem[] modems;
 
-    Escaner[] escanersDisponibles;
+    Escaner[] escaners;
 
     final int bloqueMemoria = 32;
 
@@ -27,24 +31,44 @@ public class Controlador {
     Queue<Proceso> prioridad2 = new LinkedList<>();
     Queue<Proceso> prioridad3 = new LinkedList<>();
 
-    public Controlador() {
+    public Asignador() {
+        lector();
         Proceso proceso = colaProcesos.poll();
-        impresorasDisponibles = new Impresora[2];
-        CDsDisponibles = new CD[2];
-        modemsDisponibles = new Modem[1];
-        escanersDisponibles = new Escaner[1];
+        impresoras = new Impresora[2];
+        cds = new CD[2];
+        modems = new Modem[1];
+        escaners = new Escaner[1];
+        crearRecursos();
+      //  verificarRecursos(proceso);
+
+
     }
 
-    public boolean verificarCds(Proceso proceso) {
-        if (proceso.getNumCDs() <= cdsDisponibles) {
-            cdsDisponibles -= proceso.getNumCDs();
-            return true;
-        } else {
-            return false;
+    public boolean asignarRecursos(Proceso proceso) {
+        var impresorasAsignadas = 0;
+        var cdsAsignados = 0;
+        var modemsAsignados = 0;
+        var escanersAsignados = 0;
+
+        while (impresorasAsignadas != proceso.getNumImpresoras()){
+            for (Impresora imp :  )
         }
+        /* logic
+        if (disponibles == cDs) {
+            for (var x = 0; x < cDs; x++) {
+                proceso.cdAsignados.add(CDsDisponibles[x].getIdEstado());
+                CDsDisponibles[x].setProcesoPropietario(proceso.getId());
+                CDsDisponibles[x].setEstado("Ocupado");
+            }
+
+            return true;
+        }
+        */
+
+        return false;
 
     }
-
+/*
     public void asignacion(Proceso actual) throws InterruptedException {
         while (!colaProcesos.isEmpty()) {
             boolean bandera = true;
@@ -66,8 +90,7 @@ public class Controlador {
                 if (actual.getMegas() <= bloqueMemoria) {
                     if (memoriaDisponible - bloqueMemoria >= 0) {
                         if (verificarCds(actual) && validacionModems(actual) && validacionEscaners(actual)
-                                && validacionImpresoras(actual))
-                        {
+                                && validacionImpresoras(actual)) {
                             actual.setMemoriaAsignada(bloqueMemoria);
                             memoriaDisponible -= bloqueMemoria;
                             if (actual.getPrioridad() == 1) {
@@ -87,8 +110,7 @@ public class Controlador {
                     while (bandera) {
                         if (actual.getMegas() <= bloqueMemoria * multiplicador) {
                             if (memoriaDisponible - bloqueMemoria * multiplicador >= 0) {
-                                if (verificarCds(actual) && validacionModems(actual) && validacionEscaners(actual)
-                                        && validacionImpresoras(actual)) {
+                                if (verificarRecursos(actual)) {
                                     actual.setMemoriaAsignada(bloqueMemoria * multiplicador);
                                     if (actual.getPrioridad() == 1) {
                                         prioridad1.offer(actual);
@@ -113,45 +135,54 @@ public class Controlador {
             }
         }
     }
-
-    public boolean validacionImpresoras(Proceso actual) {
-        if (actual.getNumImpresoras() <= impresorasDisponibles) {
-            impresorasDisponibles -= actual.getNumImpresoras();
+*/
+    public boolean verificarRecursos(Proceso actual) {
+       impresorasDisponibles = 0;
+       cdsDisponibles = 0;
+       modemsDisponibles = 0;
+       escanersDisponibles = 0;
+        for (Impresora imp : impresoras) {
+            if (imp.getEstado().equals("Disponible")) {
+                impresorasDisponibles++;
+            }
+        }
+        for (CD cd : cds) {
+            if (cd.getEstado().equals("Disponible")) {
+                cdsDisponibles++;
+            }
+        }
+        for (Modem modem : modems) {
+            if (modem.getEstado().equals("Disponible")) {
+                modemsDisponibles++;
+            }
+        }
+        for (Escaner scaner : escaners) {
+            if (scaner.getEstado().equals("Disponible")) {
+                escanersDisponibles++;
+            }
+        }
+        if (actual.getNumImpresoras() <= impresorasDisponibles &&
+                actual.getNumCDs() <= cdsDisponibles &&
+                actual.getNumModems() <= modemsDisponibles &&
+                actual.getNumEscaners() <= escanersDisponibles) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
 
-    public boolean validacionModems(Proceso actual) {
-        if (actual.getNumModems() <= modemsDisponibles) {
-            modemsDisponibles -= actual.getNumModems();
-            return true;
-        } else {
-            return false;
+    public void crearRecursos() {
+        for (var i = 0; i < 2; i++) {
+            Impresora impresora = new Impresora((i + 1), "Disponible");
+            impresoras[i] = impresora;
+            CD cd = new CD((i + 1), "Disponible");
+            cds[i] = cd;
         }
-    }
-
-    public boolean validacionEscaners(Proceso actual) {
-        if (actual.getNumEscaners() <= escanersDisponibles) {
-            escanersDisponibles -= actual.getNumEscaners();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void crearRecursos(){
-        for (var i = 0; i < 2; i ++){
-            Impresora impresora = new Impresora((i+1), "Disponible");
-            impresorasDisponibles[i] = impresora;
-            CD cd = new CD((i+1), "Disponible");
-            CDsDisponibles[i] = cd;
-        }
-        Escaner escaner = new Escaner(1,"Disponible");
+        Escaner escaner = new Escaner(1, "Disponible");
         Modem modem = new Modem(1, "Disponible");
-        escanersDisponibles[0] = escaner;
-        modemsDisponibles[0] = modem;
+        escaners[0] = escaner;
+        modems[0] = modem;
 
     }
 

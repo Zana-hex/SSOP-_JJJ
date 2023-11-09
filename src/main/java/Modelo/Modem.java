@@ -11,6 +11,22 @@ public class Modem {
 
     }
 
+    public int getIdModem() {
+        return idModem;
+    }
+
+    public void setIdModem(int idModem) {
+        this.idModem = idModem;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
     public int getProcesoPropietario() {
         return procesoPropietario;
     }

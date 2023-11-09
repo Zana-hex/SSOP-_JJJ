@@ -1,15 +1,14 @@
 package org.example;
 
-import Controlador.Controlador;
+import Controlador.Asignador;
 import Vista.RAM;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
-         Controlador c = new Controlador();
-         c.lector();
-         RAM r = new RAM();
-         r.setVisible(true);
+         Asignador c = new Asignador();
+
+
         }
     }

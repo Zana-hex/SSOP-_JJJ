@@ -1,8 +1,11 @@
 package Modelo;
 
+import java.util.ArrayList;
+
 public class Proceso {
     int tiempoLlegada, prioridad, tiempoProcesador, megas, numImpresoras,
             numEscaners, numModems, numCDs, id, memoriaAsignada;
+    public ArrayList<Integer> impresorasAsignadas, escanersAsignados, modemsAsignados, cdAsignados;
 
     public Proceso(int ID, int tLlegada, int priority, int tProce, int mb,
                    int numImp, int numEsc, int numMod, int numCD, int memAsig){
@@ -16,6 +19,10 @@ public class Proceso {
         this.numCDs = numCD;
         this.id = ID;
         this.memoriaAsignada = memAsig;
+        cdAsignados = new ArrayList<>();
+        impresorasAsignadas = new ArrayList<>();
+        escanersAsignados = new ArrayList<>();
+        modemsAsignados = new ArrayList<>();
 
     }
 

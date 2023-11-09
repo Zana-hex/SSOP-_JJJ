@@ -10,6 +10,22 @@ public class Escaner {
         this.estado = state;
     }
 
+    public int getIdEscaner() {
+        return idEscaner;
+    }
+
+    public void setIdEscaner(int idEscaner) {
+        this.idEscaner = idEscaner;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
     public int getProcesoPropietario() {
         return procesoPropietario;
     }
