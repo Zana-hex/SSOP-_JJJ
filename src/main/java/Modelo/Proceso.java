@@ -3,8 +3,9 @@ package Modelo;
 import java.util.ArrayList;
 
 public class Proceso {
-    int tiempoLlegada, prioridad, tiempoProcesador, megas, numImpresoras,
+    int tiempoLlegada, prioridad, tiempoProcesador, tiempoRestante, megas, numImpresoras,
             numEscaners, numModems, numCDs, id, memoriaAsignada;
+    String estado;
     public ArrayList<Integer> impresorasAsignadas, escanersAsignados, modemsAsignados, cdAsignados;
 
     public Proceso(int ID, int tLlegada, int priority, int tProce, int mb,
@@ -19,6 +20,7 @@ public class Proceso {
         this.numCDs = numCD;
         this.id = ID;
         this.memoriaAsignada = memAsig;
+        this.tiempoRestante = tLlegada;
         cdAsignados = new ArrayList<>();
         impresorasAsignadas = new ArrayList<>();
         escanersAsignados = new ArrayList<>();
@@ -104,6 +106,22 @@ public class Proceso {
 
     public void setMemoriaAsignada(int memoriaAsignada) {
         this.memoriaAsignada = memoriaAsignada;
+    }
+
+    public int getTiempoRestante() {
+        return tiempoRestante;
+    }
+
+    public void setTiempoRestante(int tiempoRestante) {
+        this.tiempoRestante = tiempoRestante;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     public String toString(){
