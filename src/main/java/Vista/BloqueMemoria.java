@@ -6,51 +6,67 @@ import java.awt.*;
 
 public class BloqueMemoria extends JPanel {
     int idPanel;
-    double porcentaje;
-    JLabel porcentajeLabel;
+    private Color color;
+    private double porcentaje;
 
-    public BloqueMemoria(int id){
-       this.idPanel = id;
-       porcentajeLabel = new JLabel();
-       this.add(porcentajeLabel);
+    JLabel porcentajeLabel, idProcesoLabel;
+
+    public BloqueMemoria(int id) {
+        porcentaje = 0.0;
+        this.idPanel = id;
+        porcentajeLabel = new JLabel();
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Establecer el diseño vertical
+
     }
 
-    public double getPorcentaje() {
-        return porcentaje;
-    }
 
-    public void setPorcentaje(double porcentaje) {
-        this.porcentaje = porcentaje;
-    }
+
+
 
     public JLabel getPorcentajeLabel() {
         return porcentajeLabel;
     }
-    public void establecerPorcentaje(double percent){
-        porcentajeLabel = null;
+
+    public void establecerPorcentaje(int percent) {
         JLabel label = new JLabel();
         String per = String.valueOf(percent);
-        label.setText(per);
+        label.setText("Uso: " + per + "%");
         setPorcentajeLabel(label);
         this.add(porcentajeLabel);
-        revalidate();
-        repaint();
     }
 
-    public void establecerColor(Color color){
+    public void establecerProceso(int id){
+        JLabel label = new JLabel();
+        String idString = String.valueOf(id);
+        label.setText("ID: " + idString);
+        setIdProcesoLabel(label);
+        this.add(idProcesoLabel);
+    }
+
+
+    public void establecerColor(Color color) {
         this.setBackground(color);
-        this.revalidate();
-        this.repaint();
     }
 
-    public void eliminar(){
-        this.remove(porcentajeLabel);
-        setBackground(Color.WHITE);
+    public void eliminar() {
+        this.removeAll();
         setBorder(new LineBorder(Color.BLACK));
-        this.revalidate();
-        this.repaint();
+        this.setBackground(Color.white);
     }
+
+    public JLabel getIdProcesoLabel() {
+        return idProcesoLabel;
+    }
+
+    public void setIdProcesoLabel(JLabel idProcesoLabel) {
+        this.idProcesoLabel = idProcesoLabel;
+    }
+
     public void setPorcentajeLabel(JLabel porcentajeLabel) {
+
         this.porcentajeLabel = porcentajeLabel;
     }
+
 }
+
+

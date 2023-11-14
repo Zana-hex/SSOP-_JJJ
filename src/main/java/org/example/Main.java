@@ -1,7 +1,8 @@
 package org.example;
 
-import Controlador.Asignador;
+import Controlador.Planificador;
 import Vista.RAM;
+import Vista.Rendimiento;
 import Vista.TablaProcesos;
 
 import javax.swing.*;
@@ -11,17 +12,28 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
 
-        RAM r = new RAM();
-        r.setVisible(true);
-        TablaProcesos tabla = new TablaProcesos();
-        tabla.setVisible(true);
-        Asignador p = new Asignador();
+        Planificador p = new Planificador();
 
+
+
+        SwingUtilities.invokeLater(() -> {
+            TablaProcesos tabla = new TablaProcesos();
+            tabla.setVisible(true);
+            p.agregarObservador(tabla);
+                });
+
+           RAM r = new RAM();
+            r.setVisible(true);
+            p.agregarObservador(r);
+/*
+        Rendimiento rendimiento = new Rendimiento();
+        rendimiento.setVisible(true);
+        p.agregarObservador(rendimiento);
+
+ */
         Thread thread1 = new Thread(p);
-        p.agregarObservador(r);
-        p.agregarObservador(tabla);
-
        thread1.start();
 
     }
+
 }

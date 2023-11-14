@@ -1,8 +1,6 @@
 package Vista;
 
-import Controlador.Asignador;
 import Modelo.Observado;
-import Modelo.ObservadorPlanificador;
 import Modelo.Proceso;
 
 import javax.swing.*;
@@ -37,7 +35,7 @@ public class TablaProcesos extends JFrame implements Observado {
         JScrollPane scrollPane = new JScrollPane(tablaProcesos);
         JTableHeader tableHeader = tablaProcesos.getTableHeader();
         JScrollPane headerScrollPane = new JScrollPane(tableHeader);
-        setSize(800, 500);
+        setBounds(150, 350,1200 , 500);
         headerScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         //setExtendedState(JFrame.MAXIMIZED_BOTH);
         // Configuración del contenedor principal
@@ -50,7 +48,7 @@ public class TablaProcesos extends JFrame implements Observado {
         // Configuración de la ventana
         //  setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+
         setVisible(true);
     }
 
@@ -82,13 +80,6 @@ public class TablaProcesos extends JFrame implements Observado {
         }
         ;
 
-
-        // Agregar una nueva fila al modelo de la tabla
-        //Object[] nuevaFila = {1, 1, "25"};
-       // modeloTabla.addRow(nuevaFila);
-
-        revalidate();
-        repaint();
         Object[] fila = {proceso.getTiempoLlegada(), proceso.getEstado(), proceso.getTiempoLlegada(),
         proceso.getPrioridadInicial(), proceso.getPrioridad(), proceso.getTiempoProcesador(),
         proceso.getTiempoRestante(), proceso.getMegas(), bloques, proceso.getNumImpresoras(),
@@ -104,7 +95,7 @@ public class TablaProcesos extends JFrame implements Observado {
 
 
     @Override
-    public void actualizar() {
+    public synchronized void actualizar() {
         modeloTabla.setRowCount(0);
         if (!vistaProcesos.isEmpty()){
             for (Proceso p : vistaProcesos) {

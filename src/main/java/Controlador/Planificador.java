@@ -9,12 +9,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
+
 import Modelo.ObservadorPlanificador;
 import Vista.BloqueMemoria;
 import Vista.RAM;
+import Vista.Rendimiento;
 import Vista.TablaProcesos;
 
-public class Asignador implements Runnable, ObservadorPlanificador {
+public class Planificador implements Runnable, ObservadorPlanificador {
 
     int memoriaDisponible = 960;
 
@@ -35,11 +38,11 @@ public class Asignador implements Runnable, ObservadorPlanificador {
     public static Queue<Proceso> prioridad2 = new LinkedList<>();
     public static Queue<Proceso> prioridad3 = new LinkedList<>();
 
-    public Asignador() {
+    public Planificador() {
 
     }
 
-    public void agregarObservador (Observado observador){
+    public void agregarObservador(Observado observador) {
         observadores.add(observador);
     }
 
@@ -100,15 +103,20 @@ public class Asignador implements Runnable, ObservadorPlanificador {
 
         boolean bandera = true;
         int multiplicador = 1;
-        if (actual.getPrioridad() == 0) {
+        if (actual.getPrioridadInicial() == 0) {
 
             actual.setMemoriaAsignada(64);
 
             BloqueMemoria bloque1 = RAM.bloques.get(0);
             BloqueMemoria bloque2 = RAM.bloques.get(1);
 
+            bloque1.establecerProceso(actual.getId());
+            bloque2.establecerProceso(actual.getId());
+
             bloque1.establecerPorcentaje(100);
             bloque2.establecerPorcentaje(100);
+
+
 
             bloque1.establecerColor(Color.red);
             bloque2.establecerColor(Color.red);
@@ -120,8 +128,8 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             actual.bloquesAsignados.add(0);
             actual.bloquesAsignados.add(1);
             colaTiempoReal.offer(actual);
-           // notificar();
 
+           // Rendimiento.establecerMemoria(memoriaDisponible);
             return true;
         }
 
@@ -141,35 +149,48 @@ public class Asignador implements Runnable, ObservadorPlanificador {
                                 }
                             }
                         }
+                        Color color = colorAleatorio();
+                        ArrayList<Integer> porcentajes = obtenerPorcentajes(actual);
                         for (int i = 0; i < actual.bloquesAsignados.size(); i++) {
                             int indice = actual.bloquesAsignados.get(i);
                             BloqueMemoria bloque = RAM.bloques.get(indice);
-                            bloque.establecerColor(Color.green);
+                            bloque.establecerColor(color);
+                            bloque.establecerProceso(actual.getId());
+                            bloque.establecerPorcentaje(porcentajes.get(i));
                             RAM.bloques.set(indice, bloque);
 
                         }
+                        if (!actual.bloquesAsignados.isEmpty()) {
+                            asignarRecursos(actual);
+                            actual.setMemoriaAsignada(bloqueMemoria * multiplicador);
+                            memoriaDisponible -= bloqueMemoria * multiplicador;
+                          //  Rendimiento.establecerMemoria(memoriaDisponible+64);
+                            actual.setEstado("Listo");
+                            if (actual.getPrioridadInicial() == 1) {
+                                prioridad1.offer(actual);
+                                // notificar();
+                                return true;
+                            }
+                            if (actual.getPrioridadInicial() == 2) {
+                                prioridad2.offer(actual);
+                                // notificar();
+                                return true;
+                            }
+                            if (actual.getPrioridadInicial() == 3) {
+                                prioridad3.offer(actual);
+                                // notificar();
+                                return true;
+                            }
+                        } else {
+                            actual.setFaltaMemoria(true);
+                            System.out.println("FALTA MEMORIA");
+                            actual.setEstado("Bloqueado");
+                            colaUsuario.offer(actual);
+                            return false;
+                        }
 
-                        asignarRecursos(actual);
-                        actual.setMemoriaAsignada(bloqueMemoria * multiplicador);
-                        memoriaDisponible -= bloqueMemoria * multiplicador;
-                        actual.setEstado("Listo");
-                        if (actual.getPrioridadInicial() == 1) {
-                            prioridad1.offer(actual);
-                           // notificar();
-                            return true;
-                        }
-                        if (actual.getPrioridadInicial() == 2) {
-                            prioridad2.offer(actual);
-                           // notificar();
-                            return true;
-                        }
-                        if (actual.getPrioridadInicial() == 3) {
-                            prioridad3.offer(actual);
-                           // notificar();
-                            return true;
-                        }
                     } else {
-                        if (!(memoriaDisponible - bloqueMemoria * multiplicador >= 0) && continuos == false) {
+                        if (!(memoriaDisponible - bloqueMemoria * multiplicador >= 0) && !continuos) {
                             actual.setFaltaMemoria(true);
                             System.out.println("FALTA MEMORIA");
                         } else {
@@ -178,7 +199,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
                         }
                         actual.setEstado("Bloqueado");
                         colaUsuario.offer(actual);
-                       // notificar();
+                        // notificar();
                         return false;
 
                     }
@@ -197,29 +218,38 @@ public class Asignador implements Runnable, ObservadorPlanificador {
         if (actual.getNumImpresoras() != 0) {
             for (int imp : actual.impresorasAsignadas) {
                 impresoras[imp - 1].setEstado("Disponible");
-                impresoras[imp - 1].setProcesoPropietario(0);
+                impresoras[imp - 1].setProcesoPropietario(-1);
             }
         }
         if (actual.getNumCDs() != 0) {
             for (int cd : actual.cdAsignados) {
                 cds[cd - 1].setEstado("Disponible");
-                cds[cd - 1].setProcesoPropietario(0);
+                cds[cd - 1].setProcesoPropietario(-1);
             }
         }
         if (actual.getNumModems() != 0) {
             for (int modem : actual.modemsAsignados) {
                 modems[modem - 1].setEstado("Disponible");
-                modems[modem - 1].setProcesoPropietario(0);
+                modems[modem - 1].setProcesoPropietario(-1);
             }
         }
         if (actual.getNumEscaners() != 0) {
             for (int esc : actual.escanersAsignados) {
                 escaners[esc - 1].setEstado("Disponible");
-                escaners[esc - 1].setProcesoPropietario(0);
+                escaners[esc - 1].setProcesoPropietario(-1);
             }
         }
-        memoriaDisponible += actual.getMemoriaAsignada();
-        actual.setMemoriaAsignada(0);
+
+        if (actual.getPrioridad() != 0) {
+            memoriaDisponible += actual.getMemoriaAsignada();
+           // Rendimiento.establecerMemoria(memoriaDisponible+64);
+            actual.setMemoriaAsignada(0);
+
+        } else {
+          //  Rendimiento.establecerMemoria(memoriaDisponible+64);
+            actual.setMemoriaAsignada(0);
+        }
+
         if (actual.getPrioridad() == 0) {
             BloqueMemoria bloque1 = RAM.bloques.get(actual.bloquesAsignados.get(0));
             BloqueMemoria bloque2 = RAM.bloques.get(actual.bloquesAsignados.get(1));
@@ -228,9 +258,9 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             RAM.bloques.set(0, bloque1);
             RAM.bloques.set(1, bloque2);
         }
-        if (actual.getPrioridad() == 1 || actual.getPrioridad() == 2 || actual.getPrioridad() == 3){
+        if (actual.getPrioridad() == 1 || actual.getPrioridad() == 2 || actual.getPrioridad() == 3) {
             ArrayList<Integer> sectores = new ArrayList<>(actual.bloquesAsignados);
-            for (int sector : sectores){
+            for (int sector : sectores) {
                 BloqueMemoria bloque = RAM.bloques.get(sector);
                 bloque.eliminar();
                 RAM.bloques.set(sector, bloque);
@@ -273,19 +303,25 @@ public class Asignador implements Runnable, ObservadorPlanificador {
         for (var i = 0; i < 2; i++) {
             Impresora impresora = new Impresora((i + 1), "Disponible");
             impresoras[i] = impresora;
+            Rendimiento.impresoras.add(impresora);
             CD cd = new CD((i + 1), "Disponible");
+            Rendimiento.cds.add(cd);
             cds[i] = cd;
+
         }
         Escaner escaner = new Escaner(1, "Disponible");
         Modem modem = new Modem(1, "Disponible");
         escaners[0] = escaner;
         modems[0] = modem;
+        Rendimiento.escaners.add(escaner);
+        Rendimiento.modems.add(modem);
+
 
     }
 
     public void lector() {
         int tLlegada, prioridad, tProcesador, mb, numImpresoras, numEsc, numModem, numCds;
-        try (BufferedReader in = new BufferedReader(new FileReader("procesos2.txt"))) {
+        try (BufferedReader in = new BufferedReader(new FileReader("procesos.txt"))) {
             String str;
             while ((str = in.readLine()) != null) {
 
@@ -313,7 +349,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
         }
     }
 
-    public void ejecucion() throws InterruptedException {
+    public synchronized void ejecucion() throws InterruptedException {
         System.out.println("\nCola Procesos: " + colaProcesos.size() + "\nCola Tiempo Real"
                 + colaTiempoReal.size() + "\nPrioridad 1: " + prioridad1.size()
                 + "\nPrioridad2: " + prioridad2.size() + "\nPrioridad3: " + prioridad3.size() + "\nCola Usuario: " + colaUsuario.size());
@@ -327,21 +363,21 @@ public class Asignador implements Runnable, ObservadorPlanificador {
 
                     p.setTiempoRestante(p.getTiempoRestante() - 1);
                     notificar();
-                    sleepInSeconds(1);
+                    quantum(1);
                 }
 
             }
             Proceso proceso = colaTiempoReal.poll();
             proceso.setEstado("Finalizado");
             liberarRecursos(proceso);
-           // notificar();
+            // notificar();
             return;
         }
         if (!prioridad1.isEmpty()) {
             Proceso proceso = prioridad1.peek();
             proceso.setEstado("Ejecucion");
             notificar();
-            sleepInSeconds(1);
+            quantum(1);
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
             if (!(proceso.getTiempoRestante() == 0)) {
                 proceso.setEstado("Listo");
@@ -354,14 +390,14 @@ public class Asignador implements Runnable, ObservadorPlanificador {
                 liberarRecursos(proceso);
                 prioridad1.remove(proceso);
 
-               // notificar();
+                // notificar();
             }
         }
         if (!prioridad2.isEmpty()) {
             Proceso proceso = prioridad2.peek();
             proceso.setEstado("Ejecucion");
             notificar();
-            sleepInSeconds(1);
+            quantum(1);
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
             if (!(proceso.getTiempoRestante() == 0)) {
                 proceso.setEstado("Listo");
@@ -382,7 +418,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             Proceso proceso = prioridad3.peek();
             proceso.setEstado("Ejecucion");
             notificar();
-            sleepInSeconds(1);
+            quantum(1);
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
 
             if (!(proceso.getTiempoRestante() == 0)) {
@@ -401,7 +437,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
         int indice = 0;
         String cola = null;
         for (int i = 0; i < prioridad1.size() && !prioridad1.isEmpty(); i++) {
-            Proceso process = prioridad1.poll();
+            Proceso process = prioridad1.peek();
             if (process.getMemoriaAsignada() > memoriaMaxima) {
                 memoriaMaxima = process.getMemoriaAsignada();
                 indice = i;
@@ -409,16 +445,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             }
         }
         for (int i = 0; i < prioridad2.size() && !prioridad2.isEmpty(); i++) {
-            Proceso process = prioridad2.poll();
-            if (process.getMemoriaAsignada() > memoriaMaxima) {
-                memoriaMaxima = process.getMemoriaAsignada();
-                indice = i;
-                cola = "Prioridad2";
-            }
-        }
-
-        for (int i = 0; i < prioridad2.size() && !prioridad2.isEmpty(); i++) {
-            Proceso process = prioridad2.poll();
+            Proceso process = prioridad2.peek();
             if (process.getMemoriaAsignada() > memoriaMaxima) {
                 memoriaMaxima = process.getMemoriaAsignada();
                 indice = i;
@@ -427,7 +454,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
         }
 
         for (int i = 0; i < prioridad3.size() && !prioridad3.isEmpty(); i++) {
-            Proceso process = prioridad3.poll();
+            Proceso process = prioridad3.peek();
             if (process.getMemoriaAsignada() > memoriaMaxima) {
                 memoriaMaxima = process.getMemoriaAsignada();
                 indice = i;
@@ -438,49 +465,55 @@ public class Asignador implements Runnable, ObservadorPlanificador {
         assert cola != null;
         if (cola.equals("Prioridad1")) {
             for (int i = 0; i < prioridad1.size() && !prioridad1.isEmpty(); i++) {
-                Proceso proceso = prioridad1.poll();
+                Proceso proceso = prioridad1.peek();
                 if (i == indice) {
                     while (proceso.getTiempoRestante() != 0) {
                         System.out.println("\nProceso Memoria: " + proceso.getId() + "\nSegundos restantes: " + proceso.getTiempoRestante());
-                        sleepInSeconds(1);
+                        proceso.setEstado("Ejecucion");
+                        notificar();
+                        quantum(1);
                         proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
                     }
                     proceso.setEstado("Finalizado");
                     liberarRecursos(proceso);
-                } else {
-                    prioridad1.offer(proceso);
+                    prioridad1.remove(proceso);
+                    break;
                 }
             }
         }
         if (cola.equals("Prioridad2")) {
             for (int i = 0; i < prioridad2.size() && !prioridad2.isEmpty(); i++) {
-                Proceso proceso = prioridad2.poll();
+                Proceso proceso = prioridad2.peek();
                 if (i == indice) {
                     while (proceso.getTiempoRestante() != 0) {
                         System.out.println("\nProceso Memoria: " + proceso.getId() + "\nSegundos restantes: " + proceso.getTiempoRestante());
-                        sleepInSeconds(1);
+                        proceso.setEstado("Ejecucion");
+                        notificar();
+                        quantum(1);
                         proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
                     }
                     proceso.setEstado("Finalizado");
                     liberarRecursos(proceso);
-                } else {
-                    prioridad2.offer(proceso);
+                    prioridad2.remove(proceso);
+                    break;
                 }
             }
         }
         if (cola.equals("Prioridad3")) {
             for (int i = 0; i < prioridad3.size() && !prioridad3.isEmpty(); i++) {
-                Proceso proceso = prioridad3.poll();
+                Proceso proceso = prioridad3.peek();
                 if (i == indice) {
                     while (proceso.getTiempoRestante() != 0) {
                         System.out.println("\nProceso Memoria: " + proceso.getId() + "\nSegundos restantes: " + proceso.getTiempoRestante());
-                        sleepInSeconds(1);
+                        proceso.setEstado("Ejecucion");
+                        notificar();
+                        quantum(1);
                         proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
                     }
                     proceso.setEstado("Finalizado");
                     liberarRecursos(proceso);
-                } else {
-                    prioridad3.offer(proceso);
+                    prioridad3.remove(proceso);
+                    break;
                 }
             }
         }
@@ -522,7 +555,13 @@ public class Asignador implements Runnable, ObservadorPlanificador {
                     throw new RuntimeException(e);
                 }
             }
-
+            if ((!(prioridad1.isEmpty()) || !(prioridad2.isEmpty()) || !(prioridad3.isEmpty())) && colaProcesos.isEmpty()) {
+                try {
+                    ejecucion();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
         }
     }
@@ -542,17 +581,41 @@ public class Asignador implements Runnable, ObservadorPlanificador {
         }
     }
 
-    public static void sleepInSeconds(int seconds) throws InterruptedException {
-        long end = System.currentTimeMillis() + seconds * 1000;
-        while (System.currentTimeMillis() < end) {
+    public static void quantum(int segundos) throws InterruptedException {
+        long fin = System.currentTimeMillis() + segundos * 1000;
+        while (System.currentTimeMillis() < fin) {
             Thread.sleep(1); // Puedes ajustar este valor si es necesario
         }
     }
 
     @Override
-    public void notificar() {
+    public synchronized void notificar() {
         for (Observado observador : observadores) {
             observador.actualizar();
         }
+    }
+
+    public Color colorAleatorio() {
+        Random random = new Random();
+        int maxComponent = 200;  // Ajusta este valor según lo claro que desees que sea el color
+        return new Color(
+                maxComponent - random.nextInt(56),  // Componente rojo más alto
+                maxComponent - random.nextInt(24),  // Componente verde más alto
+                maxComponent - random.nextInt(78)   // Componente azul más alto
+        );
+    }
+
+
+    public ArrayList<Integer> obtenerPorcentajes(Proceso proceso) {
+        ArrayList<Integer> porcentajes = new ArrayList<>();
+        double num = (double) proceso.getMegas() / 32 * 100;
+        while (num > 100) {
+
+            porcentajes.add(100);
+            num -= 100;
+
+        }
+        porcentajes.add((int) num);
+        return porcentajes;
     }
 }
