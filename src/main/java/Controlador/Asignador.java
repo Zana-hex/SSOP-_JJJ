@@ -120,7 +120,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             actual.bloquesAsignados.add(0);
             actual.bloquesAsignados.add(1);
             colaTiempoReal.offer(actual);
-            notificar();
+           // notificar();
 
             return true;
         }
@@ -178,7 +178,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
                         }
                         actual.setEstado("Bloqueado");
                         colaUsuario.offer(actual);
-                        notificar();
+                       // notificar();
                         return false;
 
                     }
@@ -334,7 +334,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             Proceso proceso = colaTiempoReal.poll();
             proceso.setEstado("Finalizado");
             liberarRecursos(proceso);
-            notificar();
+           // notificar();
             return;
         }
         if (!prioridad1.isEmpty()) {
@@ -363,7 +363,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             sleepInSeconds(1);
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
             proceso.setEstado("Listo");
-            proceso.setPrioridad(2);
+            proceso.setPrioridad(3);
             if (!(proceso.getTiempoRestante() == 0)) {
                 prioridad3.offer(proceso);
                 prioridad2.poll();
@@ -376,17 +376,14 @@ public class Asignador implements Runnable, ObservadorPlanificador {
 
         }
         if (!prioridad3.isEmpty()) {
-            Proceso proceso = prioridad3.peek();
+            Proceso proceso = prioridad3.poll();
             proceso.setEstado("Ejecucion");
-            TablaProcesos.setProcesoEjecucion(proceso);
             notificar();
             sleepInSeconds(1);
-
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
             proceso.setEstado("Listo");
             if (!(proceso.getTiempoRestante() == 0)) {
-
-                //prioridad3.offer(proceso);
+                prioridad3.offer(proceso);
             } else {
                 proceso.setEstado("Finalizado");
                 liberarRecursos(proceso);

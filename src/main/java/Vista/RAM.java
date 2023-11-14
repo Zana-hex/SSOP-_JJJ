@@ -35,12 +35,11 @@ public class RAM extends JFrame implements  Observado {
     @Override
     public void actualizar() {
         //  panel.removeAll();
-        for (BloqueMemoria bloque : bloques){
-            bloque.repaint();
-            bloque.revalidate();
-            panel.add(bloque);
+/*
             panel.revalidate();
             panel.repaint();
-        }
+
+ */
+
     }
 }
