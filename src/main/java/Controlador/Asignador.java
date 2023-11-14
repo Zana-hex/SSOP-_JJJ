@@ -125,7 +125,7 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             return true;
         }
 
-        if (actual.getPrioridad() == 1 || actual.getPrioridad() == 2 || actual.getPrioridad() == 3) {
+        if (actual.getPrioridadInicial() == 1 || actual.getPrioridadInicial() == 2 || actual.getPrioridadInicial() == 3) {
             //Color color = Color.ra
             boolean continuos = false;
             while (bandera) {
@@ -153,17 +153,17 @@ public class Asignador implements Runnable, ObservadorPlanificador {
                         actual.setMemoriaAsignada(bloqueMemoria * multiplicador);
                         memoriaDisponible -= bloqueMemoria * multiplicador;
                         actual.setEstado("Listo");
-                        if (actual.getPrioridad() == 1) {
+                        if (actual.getPrioridadInicial() == 1) {
                             prioridad1.offer(actual);
                            // notificar();
                             return true;
                         }
-                        if (actual.getPrioridad() == 2) {
+                        if (actual.getPrioridadInicial() == 2) {
                             prioridad2.offer(actual);
                            // notificar();
                             return true;
                         }
-                        if (actual.getPrioridad() == 3) {
+                        if (actual.getPrioridadInicial() == 3) {
                             prioridad3.offer(actual);
                            // notificar();
                             return true;
@@ -342,17 +342,18 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             proceso.setEstado("Ejecucion");
             notificar();
             sleepInSeconds(1);
-
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
-            proceso.setEstado("Listo");
-            proceso.setPrioridad(2);
             if (!(proceso.getTiempoRestante() == 0)) {
+                proceso.setEstado("Listo");
+                proceso.setPrioridad(2);
                 prioridad2.offer(proceso);
-                prioridad1.poll();
+                prioridad1.remove(proceso);
                 return;
             } else {
                 proceso.setEstado("Finalizado");
                 liberarRecursos(proceso);
+                prioridad1.remove(proceso);
+
                // notificar();
             }
         }
@@ -362,32 +363,34 @@ public class Asignador implements Runnable, ObservadorPlanificador {
             notificar();
             sleepInSeconds(1);
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
-            proceso.setEstado("Listo");
-            proceso.setPrioridad(3);
             if (!(proceso.getTiempoRestante() == 0)) {
+                proceso.setEstado("Listo");
+                proceso.setPrioridad(3);
                 prioridad3.offer(proceso);
-                prioridad2.poll();
+                prioridad2.remove(proceso);
 
                 return;
             } else {
                 proceso.setEstado("Finalizado");
                 liberarRecursos(proceso);
+                prioridad2.remove(proceso);
+
             }
 
         }
         if (!prioridad3.isEmpty()) {
-            Proceso proceso = prioridad3.poll();
+            Proceso proceso = prioridad3.peek();
             proceso.setEstado("Ejecucion");
             notificar();
             sleepInSeconds(1);
             proceso.setTiempoRestante(proceso.getTiempoRestante() - 1);
-            proceso.setEstado("Listo");
+
             if (!(proceso.getTiempoRestante() == 0)) {
-                prioridad3.offer(proceso);
+                proceso.setEstado("Listo");
             } else {
                 proceso.setEstado("Finalizado");
                 liberarRecursos(proceso);
-                prioridad3.poll();
+                prioridad3.remove(proceso);
             }
         }
 
@@ -520,20 +523,13 @@ public class Asignador implements Runnable, ObservadorPlanificador {
                 }
             }
 
-            if (!prioridad1.isEmpty() || !prioridad2.isEmpty() || !prioridad3.isEmpty()) {
-                try {
-                    ejecucion();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
 
         }
     }
 
     public boolean verificarContinuos(int inicio, int cantidad, Proceso actual) {
         ArrayList<Integer> indices = new ArrayList<>();
-        for (int i = inicio; i < inicio + cantidad; i++) {
+        for (int i = inicio; i < inicio + cantidad && i < 32; i++) {
             if (RAM.bloques.get(i).getBackground().equals(Color.WHITE)) {
                 indices.add(i);
             }
