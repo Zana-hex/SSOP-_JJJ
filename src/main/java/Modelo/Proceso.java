@@ -1,17 +1,23 @@
 package Modelo;
 
+import Vista.BloqueMemoria;
+
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Proceso {
     int tiempoLlegada, prioridad, tiempoProcesador, tiempoRestante, megas, numImpresoras,
-            numEscaners, numModems, numCDs, id, memoriaAsignada;
+            numEscaners, numModems, numCDs, id, memoriaAsignada, prioridadInicial;
+
     String estado;
-    public ArrayList<Integer> impresorasAsignadas, escanersAsignados, modemsAsignados, cdAsignados;
+    boolean faltaMemoria;
+    public ArrayList<Integer> impresorasAsignadas, escanersAsignados, modemsAsignados, cdAsignados, bloquesAsignados;
 
     public Proceso(int ID, int tLlegada, int priority, int tProce, int mb,
                    int numImp, int numEsc, int numMod, int numCD, int memAsig){
         this.tiempoLlegada = tLlegada;
         this.prioridad = priority;
+        this.prioridadInicial = priority;
         this.tiempoProcesador = tProce;
         this.megas = mb;
         this.numImpresoras = numImp;
@@ -20,11 +26,12 @@ public class Proceso {
         this.numCDs = numCD;
         this.id = ID;
         this.memoriaAsignada = memAsig;
-        this.tiempoRestante = tLlegada;
+        this.tiempoRestante = tProce;
         cdAsignados = new ArrayList<>();
         impresorasAsignadas = new ArrayList<>();
         escanersAsignados = new ArrayList<>();
         modemsAsignados = new ArrayList<>();
+        bloquesAsignados = new ArrayList<>();
 
     }
 
@@ -38,6 +45,22 @@ public class Proceso {
 
     public int getPrioridad() {
         return prioridad;
+    }
+
+    public int getPrioridadInicial() {
+        return prioridadInicial;
+    }
+
+    public void setPrioridadInicial(int prioridadInicial) {
+        this.prioridadInicial = prioridadInicial;
+    }
+
+    public boolean isFaltaMemoria() {
+        return faltaMemoria;
+    }
+
+    public void setFaltaMemoria(boolean faltaMemoria) {
+        this.faltaMemoria = faltaMemoria;
     }
 
     public void setPrioridad(int prioridad) {
