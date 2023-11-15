@@ -14,6 +14,11 @@ public class RAM extends JFrame implements Observado {
     JPanel panel = new JPanel();
 
     public RAM() {
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (Exception ex) {
+
+        }
         bloques = new LinkedList<>();
         this.setBounds(350, 25, 800, 300);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);

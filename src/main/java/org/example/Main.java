@@ -25,14 +25,15 @@ public class Main {
            RAM r = new RAM();
             r.setVisible(true);
             p.agregarObservador(r);
-/*
+        Thread thread1 = new Thread(p);
+        thread1.start();
+
         Rendimiento rendimiento = new Rendimiento();
         rendimiento.setVisible(true);
         p.agregarObservador(rendimiento);
 
- */
-        Thread thread1 = new Thread(p);
-       thread1.start();
+
+
 
     }
 

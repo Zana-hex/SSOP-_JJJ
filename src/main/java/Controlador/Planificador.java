@@ -21,12 +21,12 @@ public class Planificador implements Runnable, ObservadorPlanificador {
 
     int memoriaDisponible = 960;
 
-    Impresora[] impresoras;
-    CD[] cds;
+    public static ArrayList<Impresora> impresoras = new ArrayList<>();
+    public static ArrayList<CD> cds = new ArrayList<>();
 
-    Modem[] modems;
+    public static ArrayList<Modem> modems = new ArrayList<>();
 
-    Escaner[] escaners;
+    public static ArrayList<Escaner> escaners = new ArrayList<>();
 
     final int bloqueMemoria = 32;
 
@@ -39,7 +39,8 @@ public class Planificador implements Runnable, ObservadorPlanificador {
     public static Queue<Proceso> prioridad3 = new LinkedList<>();
 
     public Planificador() {
-
+        lector();
+        crearRecursos();
     }
 
     public void agregarObservador(Observado observador) {
@@ -129,7 +130,7 @@ public class Planificador implements Runnable, ObservadorPlanificador {
             actual.bloquesAsignados.add(1);
             colaTiempoReal.offer(actual);
 
-           // Rendimiento.establecerMemoria(memoriaDisponible);
+            Rendimiento.establecerMemoria(memoriaDisponible);
             return true;
         }
 
@@ -164,7 +165,7 @@ public class Planificador implements Runnable, ObservadorPlanificador {
                             asignarRecursos(actual);
                             actual.setMemoriaAsignada(bloqueMemoria * multiplicador);
                             memoriaDisponible -= bloqueMemoria * multiplicador;
-                          //  Rendimiento.establecerMemoria(memoriaDisponible+64);
+                            Rendimiento.establecerMemoria(memoriaDisponible+64);
                             actual.setEstado("Listo");
                             if (actual.getPrioridadInicial() == 1) {
                                 prioridad1.offer(actual);
@@ -217,36 +218,36 @@ public class Planificador implements Runnable, ObservadorPlanificador {
 
         if (actual.getNumImpresoras() != 0) {
             for (int imp : actual.impresorasAsignadas) {
-                impresoras[imp - 1].setEstado("Disponible");
-                impresoras[imp - 1].setProcesoPropietario(-1);
+                impresoras.get(imp - 1).setEstado("Disponible");
+                impresoras.get(imp - 1).setProcesoPropietario(-1);
             }
         }
         if (actual.getNumCDs() != 0) {
             for (int cd : actual.cdAsignados) {
-                cds[cd - 1].setEstado("Disponible");
-                cds[cd - 1].setProcesoPropietario(-1);
+                cds.get(cd - 1).setEstado("Disponible");
+                cds.get(cd-1).setProcesoPropietario(-1);
             }
         }
         if (actual.getNumModems() != 0) {
             for (int modem : actual.modemsAsignados) {
-                modems[modem - 1].setEstado("Disponible");
-                modems[modem - 1].setProcesoPropietario(-1);
+                modems.get(modem - 1).setEstado("Disponible");
+                modems.get(modem - 1).setProcesoPropietario(-1);
             }
         }
         if (actual.getNumEscaners() != 0) {
             for (int esc : actual.escanersAsignados) {
-                escaners[esc - 1].setEstado("Disponible");
-                escaners[esc - 1].setProcesoPropietario(-1);
+                escaners.get(esc - 1).setEstado("Disponible");
+                escaners.get(esc - 1).setProcesoPropietario(-1);
             }
         }
 
         if (actual.getPrioridad() != 0) {
             memoriaDisponible += actual.getMemoriaAsignada();
-           // Rendimiento.establecerMemoria(memoriaDisponible+64);
+            Rendimiento.establecerMemoria(memoriaDisponible+64);
             actual.setMemoriaAsignada(0);
 
         } else {
-          //  Rendimiento.establecerMemoria(memoriaDisponible+64);
+            Rendimiento.establecerMemoria(memoriaDisponible+64);
             actual.setMemoriaAsignada(0);
         }
 
@@ -302,19 +303,17 @@ public class Planificador implements Runnable, ObservadorPlanificador {
     public void crearRecursos() {
         for (var i = 0; i < 2; i++) {
             Impresora impresora = new Impresora((i + 1), "Disponible");
-            impresoras[i] = impresora;
-            Rendimiento.impresoras.add(impresora);
+            impresoras.add(impresora);
             CD cd = new CD((i + 1), "Disponible");
-            Rendimiento.cds.add(cd);
-            cds[i] = cd;
+            cds.add(cd);
+
 
         }
         Escaner escaner = new Escaner(1, "Disponible");
         Modem modem = new Modem(1, "Disponible");
-        escaners[0] = escaner;
-        modems[0] = modem;
-        Rendimiento.escaners.add(escaner);
-        Rendimiento.modems.add(modem);
+        escaners.add(escaner);
+        modems.add(modem);
+
 
 
     }
@@ -521,12 +520,7 @@ public class Planificador implements Runnable, ObservadorPlanificador {
 
     @Override
     public void run() {
-        lector();
-        impresoras = new Impresora[2];
-        cds = new CD[2];
-        modems = new Modem[1];
-        escaners = new Escaner[1];
-        crearRecursos();
+
         while (!colaUsuario.isEmpty() || !colaProcesos.isEmpty() ||
                 !prioridad1.isEmpty() || !prioridad2.isEmpty() || !prioridad3.isEmpty()) {
             if (!colaProcesos.isEmpty()) {

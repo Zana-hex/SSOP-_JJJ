@@ -6,13 +6,11 @@ import java.awt.*;
 
 public class BloqueMemoria extends JPanel {
     int idPanel;
-    private Color color;
-    private double porcentaje;
 
     JLabel porcentajeLabel, idProcesoLabel;
 
     public BloqueMemoria(int id) {
-        porcentaje = 0.0;
+
         this.idPanel = id;
         porcentajeLabel = new JLabel();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Establecer el diseño vertical

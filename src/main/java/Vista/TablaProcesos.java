@@ -18,6 +18,7 @@ public class TablaProcesos extends JFrame implements Observado {
     private DefaultTableModel modeloTabla;
 
     public TablaProcesos() {
+
         // Crear las columnas de la tabla
         String[] columnas = {"ID", "Estatus", "Tiempo de Llegada", "Prioridad Inicial", "Prioridad Actual",
                 "Tiempo Requerido", "Tiempo Restante", "Memoria Requerida",
