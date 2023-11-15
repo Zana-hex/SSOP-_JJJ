@@ -21,12 +21,8 @@ public class Planificador implements Runnable, ObservadorPlanificador {
 
     int memoriaDisponible = 960;
 
-    public static ArrayList<Impresora> impresoras = new ArrayList<>();
-    public static ArrayList<CD> cds = new ArrayList<>();
+    public static Recurso[] recursos;
 
-    public static ArrayList<Modem> modems = new ArrayList<>();
-
-    public static ArrayList<Escaner> escaners = new ArrayList<>();
 
     final int bloqueMemoria = 32;
 
@@ -39,8 +35,7 @@ public class Planificador implements Runnable, ObservadorPlanificador {
     public static Queue<Proceso> prioridad3 = new LinkedList<>();
 
     public Planificador() {
-        lector();
-        crearRecursos();
+
     }
 
     public void agregarObservador(Observado observador) {
@@ -55,46 +50,58 @@ public class Planificador implements Runnable, ObservadorPlanificador {
         var escanersAsignados = 0;
 
         while (impresorasAsignadas != proceso.getNumImpresoras()) {
-            for (Impresora imp : impresoras) {
-                if (imp.getEstado().equals("Disponible")) {
-                    proceso.impresorasAsignadas.add(imp.getIdImpresora());
-                    imp.setEstado("Ocupado");
-                    imp.setProcesoPropietario(proceso.getId());
-                    impresorasAsignadas++;
-                    break;
+            for (Recurso recurso : recursos) {
+                if (recurso.getTipo().equals("Impresora")) {
+                    if (recurso.getEstado().equals("Disponible")) {
+                        proceso.recursosAsignados.add(recurso.getUbicacion());
+                        proceso.impresorasAsignadas.add(recurso.getId());
+                        recurso.setEstado("Ocupado");
+                        recurso.setProcesoPropietario(proceso.getId());
+                        impresorasAsignadas++;
+                        break;
+                    }
                 }
             }
         }
         while (escanersAsignados != proceso.getNumEscaners()) {
-            for (Escaner esc : escaners) {
-                if (esc.getEstado().equals("Disponible")) {
-                    proceso.escanersAsignados.add(esc.getIdEscaner());
-                    esc.setEstado("Ocupado");
-                    esc.setProcesoPropietario(proceso.getId());
-                    escanersAsignados++;
-                    break;
+            for (Recurso recurso : recursos) {
+                if (recurso.getTipo().equals("Escaner")) {
+                    if (recurso.getEstado().equals("Disponible")) {
+                        proceso.recursosAsignados.add(recurso.getUbicacion());
+                        proceso.escanersAsignados.add(recurso.getId());
+                        recurso.setEstado("Ocupado");
+                        recurso.setProcesoPropietario(proceso.getId());
+                        escanersAsignados++;
+                        break;
+                    }
                 }
             }
         }
         while (modemsAsignados != proceso.getNumModems()) {
-            for (Modem mod : modems) {
-                if (mod.getEstado().equals("Disponible")) {
-                    proceso.modemsAsignados.add(mod.getIdModem());
-                    mod.setEstado("Ocupado");
-                    mod.setProcesoPropietario(proceso.getId());
-                    modemsAsignados++;
-                    break;
+            for (Recurso recurso : recursos) {
+                if (recurso.getTipo().equals("Modem")) {
+                    if (recurso.getEstado().equals("Disponible")) {
+                        proceso.recursosAsignados.add(recurso.getUbicacion());
+                        proceso.modemsAsignados.add(recurso.getId());
+                        recurso.setEstado("Ocupado");
+                        recurso.setProcesoPropietario(proceso.getId());
+                        modemsAsignados++;
+                        break;
+                    }
                 }
             }
         }
         while (cdsAsignados != proceso.getNumCDs()) {
-            for (CD cd : cds) {
-                if (cd.getEstado().equals("Disponible")) {
-                    proceso.cdAsignados.add(cd.getIdEstado());
-                    cd.setEstado("Ocupado");
-                    cd.setProcesoPropietario(proceso.getId());
-                    cdsAsignados++;
-                    break;
+            for (Recurso recurso : recursos) {
+                if (recurso.getTipo().equals("CD")) {
+                    if (recurso.getEstado().equals("Disponible")) {
+                        proceso.recursosAsignados.add(recurso.getUbicacion());
+                        proceso.cdAsignados.add(recurso.getId());
+                        recurso.setEstado("Ocupado");
+                        recurso.setProcesoPropietario(proceso.getId());
+                        cdsAsignados++;
+                        break;
+                    }
                 }
             }
         }
@@ -216,38 +223,21 @@ public class Planificador implements Runnable, ObservadorPlanificador {
 
     public void liberarRecursos(Proceso actual) {
 
-        if (actual.getNumImpresoras() != 0) {
-            for (int imp : actual.impresorasAsignadas) {
-                impresoras.get(imp - 1).setEstado("Disponible");
-                impresoras.get(imp - 1).setProcesoPropietario(-1);
+
+            for (int rec : actual.recursosAsignados) {
+                recursos[rec].setEstado("Disponible");
+                recursos[rec].setProcesoPropietario(-1);
             }
-        }
-        if (actual.getNumCDs() != 0) {
-            for (int cd : actual.cdAsignados) {
-                cds.get(cd - 1).setEstado("Disponible");
-                cds.get(cd-1).setProcesoPropietario(-1);
-            }
-        }
-        if (actual.getNumModems() != 0) {
-            for (int modem : actual.modemsAsignados) {
-                modems.get(modem - 1).setEstado("Disponible");
-                modems.get(modem - 1).setProcesoPropietario(-1);
-            }
-        }
-        if (actual.getNumEscaners() != 0) {
-            for (int esc : actual.escanersAsignados) {
-                escaners.get(esc - 1).setEstado("Disponible");
-                escaners.get(esc - 1).setProcesoPropietario(-1);
-            }
-        }
+
+
 
         if (actual.getPrioridad() != 0) {
             memoriaDisponible += actual.getMemoriaAsignada();
-            Rendimiento.establecerMemoria(memoriaDisponible+64);
+           Rendimiento.establecerMemoria(memoriaDisponible+64);
             actual.setMemoriaAsignada(0);
 
         } else {
-            Rendimiento.establecerMemoria(memoriaDisponible+64);
+           Rendimiento.establecerMemoria(memoriaDisponible+64);
             actual.setMemoriaAsignada(0);
         }
 
@@ -274,26 +264,29 @@ public class Planificador implements Runnable, ObservadorPlanificador {
         var cdsDisponibles = 0;
         var modemsDisponibles = 0;
         var escanersDisponibles = 0;
-        for (Impresora imp : impresoras) {
-            if (imp.getEstado().equals("Disponible")) {
-                impresorasDisponibles++;
+        for (Recurso recurso : recursos) {
+            if (recurso.getTipo().equals("Impresora")) {
+                if (recurso.getEstado().equals("Disponible")) {
+                    impresorasDisponibles++;
+                }
+            }
+            if (recurso.getTipo().equals("Escaner")) {
+                if (recurso.getEstado().equals("Disponible")) {
+                    escanersDisponibles++;
+                }
+            }
+            if (recurso.getTipo().equals("CD")) {
+                if (recurso.getEstado().equals("Disponible")) {
+                    cdsDisponibles++;
+                }
+            }
+            if (recurso.getTipo().equals("Modem")) {
+                if (recurso.getEstado().equals("Disponible")) {
+                    modemsDisponibles++;
+                }
             }
         }
-        for (CD cd : cds) {
-            if (cd.getEstado().equals("Disponible")) {
-                cdsDisponibles++;
-            }
-        }
-        for (Modem modem : modems) {
-            if (modem.getEstado().equals("Disponible")) {
-                modemsDisponibles++;
-            }
-        }
-        for (Escaner scaner : escaners) {
-            if (scaner.getEstado().equals("Disponible")) {
-                escanersDisponibles++;
-            }
-        }
+
         return actual.getNumImpresoras() <= impresorasDisponibles &&
                 actual.getNumCDs() <= cdsDisponibles &&
                 actual.getNumModems() <= modemsDisponibles &&
@@ -301,26 +294,17 @@ public class Planificador implements Runnable, ObservadorPlanificador {
     }
 
     public void crearRecursos() {
-        for (var i = 0; i < 2; i++) {
-            Impresora impresora = new Impresora((i + 1), "Disponible");
-            impresoras.add(impresora);
-            CD cd = new CD((i + 1), "Disponible");
-            cds.add(cd);
-
-
-        }
-        Escaner escaner = new Escaner(1, "Disponible");
-        Modem modem = new Modem(1, "Disponible");
-        escaners.add(escaner);
-        modems.add(modem);
-
-
-
+        recursos[0] = new Recurso(1, "Disponible", "Impresora", 0);
+        recursos[1] = new Recurso(2, "Disponible", "Impresora", 1);
+        recursos[2] = new Recurso(1, "Disponible", "Escaner", 2);
+        recursos[3] = new Recurso(1, "Disponible", "CD", 3);
+        recursos[4] = new Recurso(2, "Disponible", "CD", 4);
+        recursos[5] = new Recurso(1, "Disponible", "Modem", 5);
     }
 
     public void lector() {
         int tLlegada, prioridad, tProcesador, mb, numImpresoras, numEsc, numModem, numCds;
-        try (BufferedReader in = new BufferedReader(new FileReader("procesos.txt"))) {
+        try (BufferedReader in = new BufferedReader(new FileReader("procesos2.txt"))) {
             String str;
             while ((str = in.readLine()) != null) {
 
@@ -520,7 +504,9 @@ public class Planificador implements Runnable, ObservadorPlanificador {
 
     @Override
     public void run() {
-
+        lector();
+        recursos = new Recurso[6];
+        crearRecursos();
         while (!colaUsuario.isEmpty() || !colaProcesos.isEmpty() ||
                 !prioridad1.isEmpty() || !prioridad2.isEmpty() || !prioridad3.isEmpty()) {
             if (!colaProcesos.isEmpty()) {

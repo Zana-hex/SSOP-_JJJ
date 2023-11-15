@@ -11,8 +11,8 @@ public class Proceso {
 
     String estado;
     boolean faltaMemoria;
-    public ArrayList<Integer> impresorasAsignadas, escanersAsignados, modemsAsignados, cdAsignados, bloquesAsignados;
-
+public ArrayList<Integer> recursosAsignados, bloquesAsignados;
+    public ArrayList<Integer> impresorasAsignadas, escanersAsignados, modemsAsignados, cdAsignados;
     public Proceso(int ID, int tLlegada, int priority, int tProce, int mb,
                    int numImp, int numEsc, int numMod, int numCD, int memAsig){
         this.tiempoLlegada = tLlegada;
@@ -27,11 +27,13 @@ public class Proceso {
         this.id = ID;
         this.memoriaAsignada = memAsig;
         this.tiempoRestante = tProce;
+        recursosAsignados = new ArrayList<>();
+        bloquesAsignados = new ArrayList<>();
         cdAsignados = new ArrayList<>();
         impresorasAsignadas = new ArrayList<>();
         escanersAsignados = new ArrayList<>();
         modemsAsignados = new ArrayList<>();
-        bloquesAsignados = new ArrayList<>();
+
 
     }
 

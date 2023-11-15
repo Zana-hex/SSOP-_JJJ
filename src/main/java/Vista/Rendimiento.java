@@ -4,13 +4,11 @@ import Modelo.Observado;
 import Controlador.Planificador;
 
 import javax.swing.*;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 
 public class Rendimiento extends JFrame implements Observado {
-   public static ArrayList<Impresora> impresorasCopy = new ArrayList<>(Planificador.impresoras);
-   public static ArrayList<Escaner> escanersCopy = new ArrayList<>(Planificador.escaners);
-   public static ArrayList<CD> cdsCopy = new ArrayList<>(Planificador.cds);
-   public static ArrayList<Modem> modemsCopy = new ArrayList<>(Planificador.modems);
+
     static JPanel panel = new JPanel();
    public static int memoria;
     JLabel tituloMemoria, impresora1, impresora2, escaner, cd1, cd2, modem;
@@ -57,37 +55,37 @@ public class Rendimiento extends JFrame implements Observado {
         panel.remove(cd1);
         panel.remove(cd2);
         panel.remove(modem);
-        Impresora imp1 = impresorasCopy.get(0);
-        Impresora imp2 = impresorasCopy.get(1);
-        Escaner esc = escanersCopy.get(0);
 
-        CD CD1 = cdsCopy.get(0);
-        CD CD2 = cdsCopy.get(1);
-        Modem mod = modemsCopy.get(0);
+        Recurso imp1 = Planificador.recursos[0];
+        Recurso imp2 = Planificador.recursos[1];
+        Recurso esc = Planificador.recursos[2];
+        Recurso CD1 = Planificador.recursos[3];
+        Recurso CD2 = Planificador.recursos[4];
+        Recurso mod = Planificador.recursos[5];
 
 
-        impresora1 = new JLabel("Impresora "+ imp1.getIdImpresora() +
+        impresora1 = new JLabel("Impresora "+ imp1.getId() +
                 " " + imp1.getEstado() + " Proceso: " + imp1.getProcesoPropietario());
         impresora1.setBounds(25, 30, 300, 20);
-        impresora2 = new JLabel("Impresora "+ imp2.getIdImpresora() +
+        impresora2 = new JLabel("Impresora "+ imp2.getId() +
                 " " + imp2.getEstado() + " Proceso: " + imp2.getProcesoPropietario());
         impresora2.setBounds(25, 50, 300, 20);
 
-        escaner = new JLabel("Escaner "+ esc.getIdEscaner() +
+        escaner = new JLabel("Escaner "+ esc.getId() +
                 " " + esc.getEstado() + " Proceso: " + esc.getProcesoPropietario());
         escaner.setBounds(25, 70, 300, 20);
 
 
 
-        cd1 = new JLabel("CD "+ CD1.getIdEstado() +
+        cd1 = new JLabel("CD "+ CD1.getId() +
                 " " + CD1.getEstado() + " Proceso: " + CD1.getProcesoPropietario());
         cd1.setBounds(25, 90, 300, 20);
 
-        cd2 = new JLabel("CD "+ CD2.getIdEstado() +
+        cd2 = new JLabel("CD "+ CD2.getId() +
                 " " + CD2.getEstado() + " Proceso: " + CD2.getProcesoPropietario());
         cd2.setBounds(25, 110, 300, 20);
 
-        modem = new JLabel("Modem "+ mod.getIdModem() +
+        modem = new JLabel("Modem "+ mod.getId() +
                 " " + mod.getEstado() + " Proceso: " + mod.getProcesoPropietario());
         modem.setBounds(25, 130, 300, 20);
 
@@ -102,6 +100,7 @@ public class Rendimiento extends JFrame implements Observado {
 
 
     }
+
 
 
 }
